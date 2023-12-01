@@ -1,0 +1,17 @@
+{
+    "name": "mvc/mvc",
+    "description": "php mvc pattern",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Abu Mohammad Rafi"
+        }
+    ],
+    "require": {}
+}
