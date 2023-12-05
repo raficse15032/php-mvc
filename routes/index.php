@@ -1,15 +1,22 @@
 <?php
 use App\Http\Resolvers\RouteResolver;
 
-echo "Bismillah";
-echo "Alhamdulillah";
+session_start();
 
 $router = new RouteResolver();
 
-$router->register('/', function(){
+$router->get('/', function(){
+    echo "Bismillah";
+    echo "Alhamdulillah";
     echo "<br>Home Page";
 });
-$router->register('/invoice', function(){
-    echo "<br>Invoice Page";
-});
-$router->resolve($_SERVER['REQUEST_URI']);
+
+$router->get('/invoice', [App\Http\Controllers\InvoiceController::class,'invoiceAdd']);
+
+$router->get('/invoice/download', [App\Http\Controllers\InvoiceController::class,'invoiceDownload']);
+
+$router->post('/invoice', [App\Http\Controllers\InvoiceController::class,'invoiceUpload']);
+
+$router->get('/user',[App\Http\Controllers\UserController::class,'index']);
+
+$router->resolve($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

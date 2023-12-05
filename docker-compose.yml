@@ -2,6 +2,10 @@ version: '3'
 
 networks:
     php-net:
+
+volumes:
+    php-mysql-db:
+        name: 'php-mysql-db'
         
 services:
 
@@ -34,4 +38,27 @@ services:
             - php
         networks:
             - php-net
+
+    ####################################################################################################
+    # Mysql
+    ####################################################################################################
+    db:
+        image: 'mysql:8.0.31'
+        command:
+        - --character-set-server=utf8mb4
+        - --collation-server=utf8mb4_unicode_ci
+        - --default-authentication-plugin=mysql_native_password
+        - --local-infile=1
+        - --secure-file-priv=/sqls
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+        volumes:
+        - php-mysql-db:/var/lib/mysql
+        - .docker/mysql/sqls:/sqls
+        networks:
+            php-net:
+                aliases:
+                    - php-mysql
+        ports:
+            - 3306:3306
 
