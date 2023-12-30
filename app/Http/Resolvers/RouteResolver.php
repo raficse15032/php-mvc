@@ -4,6 +4,7 @@ use App\Http\Resolvers\Exceptions\RouteNotFoundException;
 
 class RouteResolver{
     private array $routes;
+    private array $params;
 
     public function register(string $requestMethod, string $route, callable|array $action):self
     {
@@ -17,11 +18,24 @@ class RouteResolver{
 
     public function resolve(string $requestUri, string $requestMethod)
     {
-        $route = explode('?', $requestUri)[0];
-        $action = $this->routes[$requestMethod][$route] ?? null;
+        $this->params = [];
+        
+        $requestRoute = explode('?', $requestUri)[0];
+        
+        $action = $this->routes[$requestMethod][$requestRoute] ?? null;
+
+
+        if(!$action){
+            foreach ($this->routes[$requestMethod] as $route => $routeAction) {
+                if($this->compareRoutes($requestRoute, $route)){
+                    $action = $routeAction;
+                    break;
+                }
+            } 
+        }
 
         if(is_callable($action)){
-            return call_user_func($action);
+            return call_user_func($action, ...$this->params);
         }
 
         if(is_array($action)){
@@ -30,11 +44,36 @@ class RouteResolver{
             
             if(method_exists($class,$method)){
                 $obj = new $class();
-                return call_user_func_array([$obj,$method],[]);
+                return call_user_func_array([$obj,$method],$this->params);
             }
         }
 
         throw new RouteNotFoundException();
         
+    }
+
+    private function compareRoutes($requestRoute, $route)
+    {
+        
+        $requestRouteParts = \explode('/', $requestRoute);
+        $routeParts = \explode('/', $route);
+
+        if (count($requestRouteParts) !== count($routeParts)) {
+            return false;
+        }
+
+        foreach ($routeParts as $key => $part) {
+            $pattern = '/\{.*\}/';
+            if (preg_match($pattern, $part)) {
+                $this->params[] = $requestRouteParts[$key];
+            }
+            $requestRouteParts[$key] = $part;
+        }
+        
+        if($route != \implode('/', $requestRouteParts)){
+            return false;
+        }
+
+        return true; 
     }
 }

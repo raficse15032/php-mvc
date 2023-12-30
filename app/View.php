@@ -28,11 +28,13 @@ class View{
             $$key = $value;
         }
 
-        $content = $filePath;
+        ob_start();
 
-        include(VIEW_PATH.'/layouts/index.php');
+        include($filePath);
 
-        return (string) ob_get_clean();
+        echo (string) ob_get_clean();
+
+        return "";
     }
 
     public function __toString()

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 class InvoiceController{
     public function invoiceAdd(){
-        var_dump(is_writable(STORAGE_PATH.'/'));
+        // var_dump(is_writable(STORAGE_PATH.'/'));
         echo '<form method="post" action="/invoice" enctype="multipart/form-data">
                 <input type="file" name="file"/>
                 <input type="submit" value="Upload" name="amount"/>

@@ -22,7 +22,7 @@
         <?php
         // This is where the content of the page will be included
         if (isset($content)) {
-            include($content);
+            echo $content;
         }
         ?>
     </main>
