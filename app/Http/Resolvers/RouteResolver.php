@@ -24,14 +24,17 @@ class RouteResolver{
         
         $action = $this->routes[$requestMethod][$requestRoute] ?? null;
 
-
         if(!$action){
             foreach ($this->routes[$requestMethod] as $route => $routeAction) {
                 if($this->compareRoutes($requestRoute, $route)){
                     $action = $routeAction;
                     break;
                 }
-            } 
+            }
+            
+            if(!$action){
+                throw new RouteNotFoundException();
+            }
         }
 
         if(is_callable($action)){
@@ -53,8 +56,7 @@ class RouteResolver{
     }
 
     private function compareRoutes($requestRoute, $route)
-    {
-        
+    {  
         $requestRouteParts = \explode('/', $requestRoute);
         $routeParts = \explode('/', $route);
 
@@ -66,14 +68,15 @@ class RouteResolver{
             $pattern = '/\{.*\}/';
             if (preg_match($pattern, $part)) {
                 $this->params[] = $requestRouteParts[$key];
+                $requestRouteParts[$key] = $part;
             }
-            $requestRouteParts[$key] = $part;
+            
         }
-        
+
         if($route != \implode('/', $requestRouteParts)){
             return false;
         }
-
+        
         return true; 
     }
 }

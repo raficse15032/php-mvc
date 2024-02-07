@@ -2,17 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\App;
+use App\Models\User;
 use App\View;
 use PDO;
 
 class UserController{
     public function index($id, $invoice):string
     {
-        var_dump($id, $invoice);
+        $db = App::db();
+        $email = 'abc@gmail.com';
+        $username = 'xyz-new';
+        $password = 'abc';
+        $amount = 10;
 
-        // $pdo = new PDO("mysql:host=php-mysql;dbname=php_mvc", "root", "secret");
+        try {
+            $db->beginTransaction();
 
-        // var_dump($pdo);
+            $user = new User();
+
+            $user->create($username, $email, $password);
+
+            $userId = (int)$db->lastInsertId();
+
+            $newInvoiceStatement = $db->prepare(
+                'INSERT INTO invoices (user_id, amount) VALUES (?, ?)'
+            );
+
+            $newInvoiceStatement->execute([$userId, $amount]);
+
+            $db->commit();
+        }
+        catch (\Throwable $e) {
+            if($db->inTransaction()){
+                $db->rollBack();
+            }
+        }
 
         $data = ["name" => "Abu Mohammad Rafi","message" => "Welcome to MVC"];
 
